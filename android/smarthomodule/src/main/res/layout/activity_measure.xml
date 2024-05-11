@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/hint_power"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Power"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/tv_power"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/hint_power"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/hint_power" />
+
+    <TextView
+        android:id="@+id/hint_heart_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/hint_power"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Heart Rate"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/tv_heart_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/hint_heart_rate"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/hint_heart_rate"
+
+        />
+
+    <TextView
+        android:id="@+id/hint_echo_mode_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/hint_heart_rate"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Echo Mode"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/tv_echo_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/hint_echo_mode_text"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/hint_echo_mode_text"
+        android:text="Mode Bell" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/tv_echo_mode"
+        android:layout_marginTop="30dp">
+
+        <com.eclinic.smarthomodule.view.GridView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+        <com.eclinic.smarthomodule.view.AudioWaveView
+            android:id="@+id/wave_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
+
+    <Button
+        android:id="@+id/btn_connect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Connect"
+        android:textAllCaps="false"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btn_receive_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Receive Data"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btn_echo_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_receive_data"
+        android:text="Switch Mode"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btn_firmware_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_echo_mode"
+        android:text="Firmware Update"
+        android:textAllCaps="false" />
+    <!--    <Button-->
+    <!--        android:id="@+id/btn_read_power"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="读取电量"-->
+    <!--        android:layout_above="@+id/btn_firmware_update"-->
+    <!--        android:textAllCaps="false" />-->
+
+
+</RelativeLayout>

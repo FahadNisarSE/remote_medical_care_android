@@ -1,0 +1,29 @@
+buildscript {
+    ext {
+        googlePlayServicesVersion = "+"
+        firebaseMessagingVersion = "21.1.0"
+
+        buildToolsVersion = "34.0.0"
+        minSdkVersion = 22
+        compileSdkVersion = 34
+        targetSdkVersion = 33
+        ndkVersion = "25.1.8937393"
+        kotlinVersion = "1.8.0"
+    }
+    repositories {
+        google()
+        maven {
+            url "https://jitpack.io"
+        }
+        mavenCentral()
+
+
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"

@@ -1,0 +1,2 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('minttisdk_v2.0.8.jar'))
