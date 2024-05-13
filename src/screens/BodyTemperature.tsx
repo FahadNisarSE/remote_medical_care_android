@@ -38,6 +38,8 @@ export default function BodyTemperature({navigation}: BloodOxygenProps) {
   const {temperature, setTemperature, isConnected, battery, isMeasuring} =
     useMinttiVisionStore();
 
+  console.log('is Connected: ', isConnected);
+
   function handleTestInProgress() {
     Alert.alert(
       'Test in Progress',
@@ -61,6 +63,8 @@ export default function BodyTemperature({navigation}: BloodOxygenProps) {
       }
       return true;
     });
+
+    BackHandler.removeEventListener('hardwareBackPress', () => null);
   }, [isMeasuring]);
 
   function toggleModal(status: boolean) {
@@ -156,13 +160,6 @@ export default function BodyTemperature({navigation}: BloodOxygenProps) {
                 ℃
               </CustomTextRegular>
             </View>
-            {/* <View
-              className="px-2 py-1 mt-2 border border-gray-400 rounded-full"
-              style={{opacity: temperature === 0 ? 0 : 100}}>
-              <CustomTextRegular className="text-gray-400 text-[10px]">
-                {temperatureResult()}
-              </CustomTextRegular>
-            </View> */}
           </View>
         </View>
 

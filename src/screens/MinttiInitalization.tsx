@@ -1,23 +1,23 @@
+import { DrawerToggleButton } from '@react-navigation/drawer';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
+  Dimensions,
   FlatList,
   Image,
-  TouchableOpacity,
   StyleSheet,
-  Dimensions,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+
+import AppUpdating from '../components/AppUpdating';
 import CustomTextRegular from '../components/ui/CustomTextRegular';
 import CustomTextSemiBold from '../components/ui/CustomTextSemiBold';
 import Spinner from '../components/ui/Spinner';
-import useBluetoothPermissions from '../utils/hook/useBluetoothPermission';
 import useMinttiVision from '../nativemodules/MinttiVision/useMinttiVision';
-import {useMinttiVisionStore} from '../utils/store/useMinttiVisionStore';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {HomeStackNavigatorParamList} from '../utils/AppNavigation';
-import {DrawerToggleButton} from '@react-navigation/drawer';
-import AppUpdating from '../components/AppUpdating';
+import { HomeStackNavigatorParamList } from '../utils/AppNavigation';
+import useBluetoothPermissions from '../utils/hook/useBluetoothPermission';
+import { useMinttiVisionStore } from '../utils/store/useMinttiVisionStore';
 
 const dimension = Dimensions.get('window');
 

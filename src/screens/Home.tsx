@@ -1,6 +1,6 @@
-import { DrawerToggleButton } from '@react-navigation/drawer';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { Image, StatusBar, View } from 'react-native';
+import {DrawerToggleButton} from '@react-navigation/drawer';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {Image, StatusBar, View} from 'react-native';
 import AppUpdating from '../components/AppUpdating';
 import AppointmentList from '../components/AppointmentList';
 import Instruction from '../components/Instruction';
@@ -8,13 +8,18 @@ import MeetingOngoing from '../components/MeetingOngoing';
 import TestPlan from '../components/TestPlan';
 import CustomTextRegular from '../components/ui/CustomTextRegular';
 import CustomTextSemiBold from '../components/ui/CustomTextSemiBold';
-import { BASE_IMG_URL } from '../utils/config';
-import { useSignInStore } from '../utils/store/useSignInStore';
+import {BASE_IMG_URL} from '../utils/config';
+import {useSignInStore} from '../utils/store/useSignInStore';
+import useMinttiVision from '../nativemodules/MinttiVision/useMinttiVision';
+import {useMinttiVisionStore} from '../utils/store/useMinttiVisionStore';
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function Home() {
   const {userData} = useSignInStore();
+  const {isConnected} = useMinttiVisionStore();
+
+  console.log('is connected: ', isConnected);
 
   return (
     <>

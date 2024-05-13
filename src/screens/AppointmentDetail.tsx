@@ -1,6 +1,7 @@
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useState} from 'react';
+import { DrawerToggleButton } from '@react-navigation/drawer';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -9,11 +10,8 @@ import {
   View,
 } from 'react-native';
 import useGetAppointmentDetails from '../api/query/useGetAppointmentDetails';
-import {AppointmentAnswer, AppointmentTest} from '../api/schema/Appointment';
-import {HomeStackNavigatorParamList} from '../utils/AppNavigation';
-import {BASE_IMG_URL} from '../utils/config';
-import {useAppointmentDetailStore} from '../utils/store/useAppointmentDetailStore';
-import {useMeetingOngoingStore} from '../utils/store/useMeetingOgoingStore';
+import { AppointmentAnswer, AppointmentTest } from '../api/schema/Appointment';
+import AppUpdating from '../components/AppUpdating';
 import AppointmentQuestions from '../components/AppointmentQuestions';
 import CustomSafeArea from '../components/CustomSafeArea';
 import MeetingOngoing from '../components/MeetingOngoing';
@@ -22,8 +20,10 @@ import CustomTextRegular from '../components/ui/CustomTextRegular';
 import CustomTextSemiBold from '../components/ui/CustomTextSemiBold';
 import Error from '../components/ui/Error';
 import Loader from '../components/ui/Loader';
-import {DrawerToggleButton} from '@react-navigation/drawer';
-import AppUpdating from '../components/AppUpdating';
+import { HomeStackNavigatorParamList } from '../utils/AppNavigation';
+import { BASE_IMG_URL } from '../utils/config';
+import { useAppointmentDetailStore } from '../utils/store/useAppointmentDetailStore';
+import { useMeetingOngoingStore } from '../utils/store/useMeetingOgoingStore';
 
 export type AppointmentDetailTab = {
   'Recom. tests': {appointmentTests: AppointmentTest[]};

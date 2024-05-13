@@ -115,6 +115,8 @@ export default function ECG({navigation}: ECGProps) {
       }
       return true;
     });
+
+    BackHandler.removeEventListener('hardwareBackPress', () => null);
   }, [isMeasuring]);
 
   function toggleModal(status: boolean) {

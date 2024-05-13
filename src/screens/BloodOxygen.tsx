@@ -113,6 +113,8 @@ export default function BloodOxygen({navigation}: BloodOxygenProps) {
       }
       return true;
     });
+
+    BackHandler.removeEventListener('hardwareBackPress', () => null);
   }, [isMeasuring]);
 
   useEffect(() => {

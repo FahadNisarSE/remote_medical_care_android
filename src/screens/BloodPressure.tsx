@@ -99,6 +99,8 @@ export default function BloodPressure({navigation}: BloodOxygenProps) {
       }
       return true;
     });
+
+    BackHandler.removeEventListener('hardwareBackPress', () => null);
   }, [isMeasuring]);
 
   function toggleModal(status: boolean) {

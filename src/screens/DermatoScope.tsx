@@ -48,9 +48,7 @@ export default function DermatoScope({navigation, route}: DermatoScopeProps) {
   const isActive = isFocused && AppState.currentState === 'active';
   const cameraRef = useRef<Camera>(null);
   const [isInitalized, setIsInitalized] = useState(false);
-  const [galleryImage, setGalleryImage] = useState<DocumentPickerResponse[]>(
-    [],
-  );
+  const [galleryImage, setGalleryImage] = useState<DocumentPickerResponse[]>([]);
   const [cameraImage, setCameraImage] = useState<PhotoFile[]>([]);
   const {mutate, isPending} = useSaveDermatoScopeImages();
   const {appointmentDetail} = useAppointmentDetailStore();

@@ -76,7 +76,8 @@ const AppointmentMeeting = ({navigation}: LiveMeetingProps) => {
     appointmentId,
     setAppointmentId,
   } = useMeetingOngoingStore();
-  const {data, isError, isLoading, refetch} = useGetAppointmentDetails( appointmentId!,
+  const {data, isError, isLoading, refetch} = useGetAppointmentDetails(
+    appointmentId!,
   );
   const {mutate} = useGetAppointmentToken();
   const current_time = new Date().toISOString();
@@ -85,11 +86,14 @@ const AppointmentMeeting = ({navigation}: LiveMeetingProps) => {
   const [isFrontCameraActive, setIsFrontCameraActive] = useState(true);
 
   const agoraEngineRef = useRef<IRtcEngineEx>();
-  const [remoteUid, setRemoteUid] = useState< {uid: number; audio: boolean; video: boolean}[] >([]);
+  const [remoteUid, setRemoteUid] = useState<
+    {uid: number; audio: boolean; video: boolean}[]
+  >([]);
   const [activeVideo, setActiveVideo] = useState<number | null>(null);
   const [isJoined, setIsJoined] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
-  const {getAgoraPermission, cameraAndMicrophonePermissions} = useCameraAndMicPermission();
+  const {getAgoraPermission, cameraAndMicrophonePermissions} =
+    useCameraAndMicPermission();
   const token = useRef<undefined | TokenData>();
   const isScreenFocues = useIsFocused();
 
@@ -98,7 +102,9 @@ const AppointmentMeeting = ({navigation}: LiveMeetingProps) => {
   const [screenSharing, setScreenSharing] = useState(false);
   const [muteRemoteAudio, setMuteRemoteAudio] = useState(false);
   const [demoVideo, setDemoVideo] = useState(false);
-  const [modalType, setModalType] = useState< 'other-options' | 'chat' | 'invite' | 'dermatoscope' >('other-options');
+  const [modalType, setModalType] = useState<
+    'other-options' | 'chat' | 'invite' | 'dermatoscope'
+  >('other-options');
 
   const [chat, setChat] = useState(false);
   const [dermatoScopeEnabled, setDermatoScopeEnabled] = useState(false);
@@ -110,7 +116,9 @@ const AppointmentMeeting = ({navigation}: LiveMeetingProps) => {
 
   useEffect(() => {
     setupVideoSDKEngine();
-    setTimeout(() => setDemoVideo(prev => !prev), 1000);
+    setTimeout(() => {
+      setDemoVideo(prev => !prev);
+    }, 1000);
 
     return () => {
       agoraEngineRef.current?.removeAllListeners();
@@ -118,6 +126,16 @@ const AppointmentMeeting = ({navigation}: LiveMeetingProps) => {
       stopScreenSharing();
     };
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      switchCamera();
+    }, 2000);
+
+    setTimeout(() => {
+      switchCamera();
+    }, 2500);
+  }, [isScreenFocues]);
 
   useEffect(() => {
     if (isJoined && !isOngoingMeeting) {
@@ -524,93 +542,93 @@ const AppointmentMeeting = ({navigation}: LiveMeetingProps) => {
       {/* Header */}
       {isJoined && (
         <View className="absolute top-0 z-30 flex-1 w-full p-2 h-fit">
-          <View className='flex-row items-center justify-between flex-1 w-full p-2 mx-auto rounded-md bg-black/40'>
-          <TouchableOpacity
-          onPress={() => navigation.navigate('Home')}
-            disabled={!isJoined}
-            className="flex items-center justify-center w-10 h-10 mr-2 rounded-xl bg-secondary">
-            <Image
-              className="w-5 h-5"
-              source={require('../assets/icons/home.png')}
-              alt="toggle remote audio"
-            />
-            <CustomTextRegular
-              className={`text-white text-[8px] mt-[1px] text-center`}>
-              Invite
-            </CustomTextRegular>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setModalType('invite');
-              setChat(false);
-              setShowModal(true);
-            }}
-            disabled={!isJoined}
-            className="flex items-center justify-center w-10 h-10 mr-2 rounded-xl bg-secondary">
-            <Image
-              className="w-5 h-5"
-              source={require('../assets/icons/user-plus.png')}
-              alt="toggle remote audio"
-            />
-            <CustomTextRegular
-              className={`text-white text-[8px] mt-[1px] text-center`}>
-              Invite
-            </CustomTextRegular>
-          </TouchableOpacity>
-          <MeetingTimer meetingEndTime={new Date(data?.IsoEndTime!)} />
-          <View className="flex-row items-center">
+          <View className="flex-row items-center justify-between flex-1 w-full p-2 mx-auto rounded-md bg-black/40">
             <TouchableOpacity
-              onPress={() => toggleRemoteAudio()}
+              onPress={() => navigation.navigate('Home')}
               disabled={!isJoined}
-              className={`flex items-center justify-center mr-2 w-10 h-10 rounded-xl ${
-                muteRemoteAudio ? 'bg-white' : 'bg-primmary'
-              }`}>
+              className="flex items-center justify-center w-10 h-10 mr-2 rounded-xl bg-secondary">
               <Image
                 className="w-5 h-5"
-                source={
-                  muteRemoteAudio
-                    ? require('../assets/icons/volume-x.png')
-                    : require('../assets/icons/volume-2.png')
-                }
+                source={require('../assets/icons/home.png')}
                 alt="toggle remote audio"
               />
               <CustomTextRegular
-                className={`${
-                  muteRemoteAudio ? 'text-text' : 'text-white'
-                } text-[8px] mt-[1px] text-center`}>
-                {muteRemoteAudio ? 'Unmute' : 'Mute'}
+                className={`text-white text-[8px] mt-[1px] text-center`}>
+                Invite
               </CustomTextRegular>
             </TouchableOpacity>
-            {dermatoScopeEnabled ? (
+            <TouchableOpacity
+              onPress={() => {
+                setModalType('invite');
+                setChat(false);
+                setShowModal(true);
+              }}
+              disabled={!isJoined}
+              className="flex items-center justify-center w-10 h-10 mr-2 rounded-xl bg-secondary">
+              <Image
+                className="w-5 h-5"
+                source={require('../assets/icons/user-plus.png')}
+                alt="toggle remote audio"
+              />
+              <CustomTextRegular
+                className={`text-white text-[8px] mt-[1px] text-center`}>
+                Invite
+              </CustomTextRegular>
+            </TouchableOpacity>
+            <MeetingTimer meetingEndTime={new Date(data?.IsoEndTime!)} />
+            <View className="flex-row items-center">
               <TouchableOpacity
-                onPress={() => stopDermatoScope()}
-                className={`flex-row items-center justify-center p-2 rounded-xl bg-amber-500`}>
-                <Image
-                  className="w-5 h-5"
-                  source={require('../assets/icons/dermatology_lens.png')}
-                  alt="Close dermatology lesn"
-                />
-                <CustomTextRegular className="text-white text-[10px] ml-1">
-                  Stop Lens
-                </CustomTextRegular>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                onPress={() => switchCamera()}
+                onPress={() => toggleRemoteAudio()}
                 disabled={!isJoined}
-                className="flex items-center justify-center w-10 h-10 rounded-xl bg-primmary">
+                className={`flex items-center justify-center mr-2 w-10 h-10 rounded-xl ${
+                  muteRemoteAudio ? 'bg-white' : 'bg-primmary'
+                }`}>
                 <Image
                   className="w-5 h-5"
-                  source={require('../assets/icons/switch-camera.png')}
+                  source={
+                    muteRemoteAudio
+                      ? require('../assets/icons/volume-x.png')
+                      : require('../assets/icons/volume-2.png')
+                  }
                   alt="toggle remote audio"
                 />
                 <CustomTextRegular
-                  className={`text-white text-[8px] mt-0.5 text-center`}>
-                  Switch
+                  className={`${
+                    muteRemoteAudio ? 'text-text' : 'text-white'
+                  } text-[8px] mt-[1px] text-center`}>
+                  {muteRemoteAudio ? 'Unmute' : 'Mute'}
                 </CustomTextRegular>
               </TouchableOpacity>
-            )}
-          </View>
+              {dermatoScopeEnabled ? (
+                <TouchableOpacity
+                  onPress={() => stopDermatoScope()}
+                  className={`flex-row items-center justify-center p-2 rounded-xl bg-amber-500`}>
+                  <Image
+                    className="w-5 h-5"
+                    source={require('../assets/icons/dermatology_lens.png')}
+                    alt="Close dermatology lesn"
+                  />
+                  <CustomTextRegular className="text-white text-[10px] ml-1">
+                    Stop Lens
+                  </CustomTextRegular>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => switchCamera()}
+                  disabled={!isJoined}
+                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-primmary">
+                  <Image
+                    className="w-5 h-5"
+                    source={require('../assets/icons/switch-camera.png')}
+                    alt="toggle remote audio"
+                  />
+                  <CustomTextRegular
+                    className={`text-white text-[8px] mt-0.5 text-center`}>
+                    Switch
+                  </CustomTextRegular>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
       )}
@@ -781,85 +799,85 @@ const AppointmentMeeting = ({navigation}: LiveMeetingProps) => {
       {/*  Control Options */}
       {isJoined && (
         <View className="absolute bottom-0 z-30 p-2 h-fit">
-          <View className='flex-row items-center justify-between flex-1 w-full p-2 mx-auto rounded-md bg-black/40'>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            // onPress={
-            //   // joinChannelFromNative(token.current, data?.MeetingChannel!, 123)
-            // }
-            onPress={() => toggleMicrophone()}
-            className={`flex items-center justify-center w-12 h-12 rounded-2xl ${
-              microphone ? 'bg-primmary' : 'bg-white'
-            }`}>
-            <Image
-              source={
-                microphone
-                  ? require('../assets/icons/mic.png')
-                  : require('../assets/icons/mic-off.png')
-              }
-              className="w-5 h-5"
-            />
-            <CustomTextRegular className="text-white text-[8px] mt-[1px] text-center">
-              Mic
-            </CustomTextRegular>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => toggleLocalVideo()}
-            className={`flex items-center justify-center w-12 h-12 rounded-2xl ${
-              enableVideo ? 'bg-primmary' : 'bg-white'
-            }`}>
-            <Image
-              source={
-                enableVideo
-                  ? require('../assets/icons/video.png')
-                  : require('../assets/icons/video-off.png')
-              }
-              className="w-5 h-5"
-            />
-            <CustomTextRegular className="text-white text-[8px] mt-[1px] text-center">
-              Camera
-            </CustomTextRegular>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => leave()}
-            className={`flex items-center justify-center w-16 h-16 rounded-full ${
-              isJoined ? 'bg-red-500' : 'bg-primmary'
-            }`}>
-            <Image
-              source={require('../assets/icons/phone.png')}
-              className="w-6 h-6"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => openChat()}
-            className="flex items-center justify-center w-12 h-12 bg-white rounded-2xl">
-            <Image
-              source={require('../assets/icons/message.png')}
-              className="w-5 h-5"
-            />
-            <CustomTextRegular className="text-text text-[8px] mt-[1px] text-center">
-              Chat
-            </CustomTextRegular>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => {
-              setModalType('other-options');
-              setChat(false);
-              setShowModal(true);
-            }}
-            className="flex items-center justify-center w-12 h-12 bg-white rounded-2xl">
-            <Image
-              source={require('../assets/icons/menu.png')}
-              className="w-5 h-5"
-            />
-            <CustomTextRegular className="text-text text-[8px] mt-[1px] text-center">
-              Menu
-            </CustomTextRegular>
-          </TouchableOpacity>
+          <View className="flex-row items-center justify-between flex-1 w-full p-2 mx-auto rounded-md bg-black/40">
+            <TouchableOpacity
+              activeOpacity={0.7}
+              // onPress={
+              //   // joinChannelFromNative(token.current, data?.MeetingChannel!, 123)
+              // }
+              onPress={() => toggleMicrophone()}
+              className={`flex items-center justify-center w-12 h-12 rounded-2xl ${
+                microphone ? 'bg-primmary' : 'bg-white'
+              }`}>
+              <Image
+                source={
+                  microphone
+                    ? require('../assets/icons/mic.png')
+                    : require('../assets/icons/mic-off.png')
+                }
+                className="w-5 h-5"
+              />
+              <CustomTextRegular className="text-white text-[8px] mt-[1px] text-center">
+                Mic
+              </CustomTextRegular>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => toggleLocalVideo()}
+              className={`flex items-center justify-center w-12 h-12 rounded-2xl ${
+                enableVideo ? 'bg-primmary' : 'bg-white'
+              }`}>
+              <Image
+                source={
+                  enableVideo
+                    ? require('../assets/icons/video.png')
+                    : require('../assets/icons/video-off.png')
+                }
+                className="w-5 h-5"
+              />
+              <CustomTextRegular className="text-white text-[8px] mt-[1px] text-center">
+                Camera
+              </CustomTextRegular>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => leave()}
+              className={`flex items-center justify-center w-16 h-16 rounded-full ${
+                isJoined ? 'bg-red-500' : 'bg-primmary'
+              }`}>
+              <Image
+                source={require('../assets/icons/phone.png')}
+                className="w-6 h-6"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={() => openChat()}
+              className="flex items-center justify-center w-12 h-12 bg-white rounded-2xl">
+              <Image
+                source={require('../assets/icons/message.png')}
+                className="w-5 h-5"
+              />
+              <CustomTextRegular className="text-text text-[8px] mt-[1px] text-center">
+                Chat
+              </CustomTextRegular>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={() => {
+                setModalType('other-options');
+                setChat(false);
+                setShowModal(true);
+              }}
+              className="flex items-center justify-center w-12 h-12 bg-white rounded-2xl">
+              <Image
+                source={require('../assets/icons/menu.png')}
+                className="w-5 h-5"
+              />
+              <CustomTextRegular className="text-text text-[8px] mt-[1px] text-center">
+                Menu
+              </CustomTextRegular>
+            </TouchableOpacity>
           </View>
         </View>
       )}

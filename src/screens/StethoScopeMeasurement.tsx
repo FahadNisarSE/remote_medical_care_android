@@ -17,11 +17,9 @@ import {
   Modal,
   PixelRatio,
   Pressable,
-  StyleSheet,
   ToastAndroid,
   TouchableOpacity,
   View,
-  findNodeHandle,
   useWindowDimensions,
 } from 'react-native';
 import Draggable from 'react-native-draggable';
@@ -32,12 +30,14 @@ import RecordScreen, {
 import Toast from 'react-native-toast-message';
 import {
   Camera,
+  getCameraDevice,
   useCameraDevice,
+  useCameraDevices,
   useCameraPermission,
 } from 'react-native-vision-camera';
+
 import {queryClient} from '../../App';
-import useSaveSelfAssessment from '../api/action/useSaveSelfAssesment';
-import useSaveTestResults from '../api/action/useSaveTestResult';
+import useSaveStethoScopeResult from '../api/action/useSaveStethoScopeResult';
 import AppUpdating from '../components/AppUpdating';
 import BatteryIndicator from '../components/BatteryIndicatory';
 import MeetingOngoing from '../components/MeetingOngoing';
@@ -54,9 +54,6 @@ import {HomeStackNavigatorParamList} from '../utils/AppNavigation';
 import {useAppointmentDetailStore} from '../utils/store/useAppointmentDetailStore';
 import {useMeetingOngoingStore} from '../utils/store/useMeetingOgoingStore';
 import {useSmarthoInitialization} from '../utils/store/useSmarthoInitalization';
-import useSaveStethoScopeResult from '../api/action/useSaveStethoScopeResult';
-
-// SmarthoViewManager
 
 type StethoScopeMeasurementProps = NativeStackScreenProps<
   HomeStackNavigatorParamList,
@@ -72,7 +69,8 @@ export default function StethoScopeMeasurement({
   const {hasPermission, requestPermission} = useCameraPermission();
   const isFocused = useIsFocused();
   const isActive = isFocused && AppState.currentState === 'active';
-  const device = useCameraDevice('front');
+  const devices = useCameraDevices();
+  const [device, setDevice] = useState(getCameraDevice(devices, 'back'));
   const cameraRef = useRef<Camera>(null);
   const [videoRecord, setVideoRecord] = useState<RecordingResponse>();
   const [allowedPermission, setAllowedPermission] = useState(hasPermission);
@@ -81,7 +79,6 @@ export default function StethoScopeMeasurement({
 
   const {
     battery,
-    getPCMFilePath,
     ref,
     initalizeMeasurementGraph,
     startMeasurement,
@@ -132,10 +129,13 @@ export default function StethoScopeMeasurement({
       if (isMeasuring) {
         handleTestInProgress();
       } else {
-        navigation.goBack();
+        setDevice(getCameraDevice(devices, 'back'));
+        setTimeout(() => navigation.goBack(), 1000);
       }
       return true;
     });
+
+    BackHandler.removeEventListener('hardwareBackPress', () => null);
   }, [isMeasuring]);
 
   useCallback(() => {
@@ -186,6 +186,14 @@ export default function StethoScopeMeasurement({
       console.log('Error in file: ', error);
     }
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      setTimeout(() => {
+        setDevice(getCameraDevice(devices, 'front'));
+      }, 1000);
+    }
+  }, [isFocused]);
 
   const handleStartMeasurement = async () => {
     !isOngoingMeeting && (await startRecording());
@@ -482,18 +490,13 @@ export default function StethoScopeMeasurement({
                 }}
                 video={true}
                 audio={false}
-                onError={error => {
-                  Toast.show({
-                    type: 'error',
-                    text1: "Couldn't access camera",
-                    text2: error.message,
-                  });
-
-                  console.log('first', error);
-                }}
+                onError={() => {}}
                 device={device!}
-                onInitialized={() => console.log('Camera Initialized...')}
-                isActive={isActive}
+                onInitialized={() => {}}
+                isActive={
+                  navigation.getState().routes[navigation.getState().index]
+                    .name === 'StethoScopeMeasurement' && isActive
+                }
               />
             </View>
           </Draggable>
@@ -632,7 +635,7 @@ export default function StethoScopeMeasurement({
                   disabled={isPending}
                   className="px-4 py-2 ml-2 border rounded-md bg-primmary border-primmary">
                   <CustomTextRegular className="text-center text-white">
-                    {isPending || uploadingVideo ? 'Saving...' : 'Save Result'}
+                    {isPending ? 'Saving...' : 'Save Result'}
                   </CustomTextRegular>
                 </TouchableOpacity>
               </View>

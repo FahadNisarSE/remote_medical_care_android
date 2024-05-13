@@ -27,6 +27,7 @@ import CustomTextRegular from './ui/CustomTextRegular';
 import CustomTextSemiBold from './ui/CustomTextSemiBold';
 import Loader from './ui/Loader';
 import NoRecommendedTests from './ui/NoRecommendedTests';
+import { useMinttiVisionStore } from '../utils/store/useMinttiVisionStore';
 
 const {width, height} = Dimensions.get('window');
 
@@ -90,7 +91,7 @@ function Item({
   const navigation =
     useNavigation<NativeStackNavigationProp<HomeStackNavigatorParamList>>();
   const {isConnected} = useSmarthoInitialization();
-  const {isConnected: isMinttiConnected} = useSmarthoInitialization();
+  const {isConnected: isMinttiConnected} = useMinttiVisionStore();
   const {setAudioAndVideoUrl} = useTestResultModalStore();
 
   const onPressHanlder = () => {
@@ -122,7 +123,7 @@ function Item({
         appointmentTestId: AppointmentTestId,
       });
       const screen = mapTestUrl(TestName);
-      console.log('Screen: ', screen);
+      console.log('Screen: ', {screen, isMinttiConnected});
       if (!isMinttiConnected || screen === 'MinttiInitalization')
         navigation.navigate('MinttiInitalization', {
           testRoute: mapTestUrl(TestName),

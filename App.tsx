@@ -56,6 +56,7 @@ export default function App() {
     minttiEventEmitter.addListener('onDisconnected', event => {
       setMinttiConnected(false);
       setMinttiConnecting(false);
+      console.log("This part ran.....")
       Toast.show({
         type: 'error',
         text1: 'Medical device has been diconnected..',

@@ -1,12 +1,11 @@
+import {DrawerToggleButton} from '@react-navigation/drawer';
 import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useEffect, useRef, useState} from 'react';
 import {
-  AppState,
   Dimensions,
   Image,
   Pressable,
-  Text,
   TouchableOpacity,
   View,
   useWindowDimensions,
@@ -18,17 +17,19 @@ import Toast from 'react-native-toast-message';
 import {
   Camera,
   PhotoFile,
+  getCameraDevice,
   useCameraDevice,
+  useCameraDevices,
   useCameraPermission,
 } from 'react-native-vision-camera';
+
+import {queryClient} from '../../App';
+import useSaveSelfAssessment from '../api/action/useSaveSelfAssesment';
 import Button from '../components/ui/Button';
+import CustomTextRegular from '../components/ui/CustomTextRegular';
 import CustomTextSemiBold from '../components/ui/CustomTextSemiBold';
 import {HomeStackNavigatorParamList} from '../utils/AppNavigation';
-import useSaveSelfAssessment from '../api/action/useSaveSelfAssesment';
 import {useAppointmentDetailStore} from '../utils/store/useAppointmentDetailStore';
-import {queryClient} from '../../App';
-import {DrawerToggleButton} from '@react-navigation/drawer';
-import CustomTextRegular from '../components/ui/CustomTextRegular';
 
 const {width, height} = Dimensions.get('window');
 
@@ -41,7 +42,6 @@ export default function SelfAssessment({navigation, route}: TakePhotosProps) {
   const {hasPermission, requestPermission} = useCameraPermission();
   const [allowedPermission, setAllowedPermission] = useState(hasPermission);
   const isFocused = useIsFocused();
-  const isActive = isFocused && AppState.currentState === 'active';
   const cameraRef = useRef<Camera>(null);
   const [isInitalized, setIsInitalized] = useState(false);
   const [galleryImage, setGalleryImage] =
@@ -49,7 +49,8 @@ export default function SelfAssessment({navigation, route}: TakePhotosProps) {
   const [cameraImage, setCameraImage] = useState<PhotoFile | undefined>();
   const {mutate, isPending} = useSaveSelfAssessment();
   const {appointmentDetail} = useAppointmentDetailStore();
-  const device = useCameraDevice('back');
+  const devices = useCameraDevices();
+  const [device, setDevice] = useState(getCameraDevice(devices, 'back'));
   const [takingPhoto, setTakingPhoto] = useState(false);
 
   const {appointmentTestId, testName} = route.params;
@@ -219,10 +220,7 @@ export default function SelfAssessment({navigation, route}: TakePhotosProps) {
         style={{
           width: width * 0.9,
           height: height * 0.5,
-          display:
-            isInitalized && (hasPermission || allowedPermission)
-              ? 'flex'
-              : 'none',
+          display: isInitalized && (hasPermission || allowedPermission)? 'flex' : 'none',
         }}
         device={device!}
         onError={error => {
@@ -237,7 +235,10 @@ export default function SelfAssessment({navigation, route}: TakePhotosProps) {
         onInitialized={() => setIsInitalized(true)}
         ref={cameraRef}
         photo={true}
-        isActive={isActive}
+        isActive={
+          navigation.getState().routes[navigation.getState().index].name ===
+          'SelfAssessment'
+        }
       />
       {(!isInitalized || !hasPermission || !allowedPermission) && (
         <View
