@@ -5,6 +5,8 @@ import com.eclinic.smarthomodule.SmarthoController
 import com.eclinic.smarthomodule.SmarthoViewManager
 import com.eclinic.visionmodule.VisionController
 import com.eclinic.visionmodule.VisionViewManager
+import com.eclinic.visionmodule.BoGraphViewManager
+import com.eclinic.visionmodule.EcgChartViewManager
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
@@ -26,7 +28,9 @@ class SmartDevicesPackage : ReactPackage {
         return mutableListOf(
             OTGCameraViewManager(reactAppContext),
             VisionViewManager(reactAppContext),
-            SmarthoViewManager(reactAppContext)
+            BoGraphViewManager(reactAppContext),
+            EcgChartViewManager(reactAppContext),
+            SmarthoViewManager(reactAppContext),
         )
     }
 }

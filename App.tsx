@@ -1,45 +1,31 @@
+import NetInfo from '@react-native-community/netinfo';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import React, {useEffect, useState} from 'react';
-import {Alert, Platform} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Alert, NativeEventEmitter, NativeModules, Platform} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import PushNotification from 'react-native-push-notification';
 import SplashScreen from 'react-native-splash-screen';
-import {StethoScopeProvider} from './src/nativemodules/SmarthoStethoScope/useStethoScope';
-import AppNavigation from './src/utils/AppNavigation';
 import Toast from 'react-native-toast-message';
-import {hideMeetingNotification} from './src/utils/pushNotification';
-import NetInfo from '@react-native-community/netinfo';
 import SpInAppUpdates, {
   IAUUpdateKind,
   StartUpdateOptions,
 } from 'sp-react-native-in-app-updates';
 
-const inAppUpdates = new SpInAppUpdates(true);
+import {StethoScopeProvider} from './src/nativemodules/SmarthoStethoScope/useStethoScope';
+import AppNavigation from './src/utils/AppNavigation';
+import {hideMeetingNotification} from './src/utils/pushNotification';
+import {useMinttiVisionStore} from './src/utils/store/useMinttiVisionStore';
 
-const checkUpdates = async () => {
-  try {
-    const result = await inAppUpdates.checkNeedsUpdate();
-    if (result.shouldUpdate) {
-      let updateOptions: StartUpdateOptions = {};
-      if (Platform.OS === 'android') {
-        updateOptions = {
-          updateType: IAUUpdateKind.FLEXIBLE,
-        };
-      }
-      await inAppUpdates.startUpdate(updateOptions);
-      inAppUpdates.installUpdate()
-    }
-  } catch (error) {
-    console.log('In app update: ', error);
-  }
-};
+const inAppUpdates = new SpInAppUpdates(true);
 
 export const queryClient = new QueryClient();
 
 export default function App() {
-  const [isConnected, setConnected] = useState(true);
+  const [connected, setConnected] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const { setIsConnected: setMinttiConnected, setIsConnecting: setMinttiConnecting } = useMinttiVisionStore();
 
-  const createNotificationChannels = () => {
+  const createNotificationChannels = useCallback(() => {
     PushNotification.createChannel(
       {
         channelId: 'meeting-channel',
@@ -47,12 +33,26 @@ export default function App() {
       },
       result => {},
     );
-  };
+  }, [])
 
   useEffect(() => {
+    const minttiEventEmitter = new NativeEventEmitter(
+      NativeModules.VisionModule,
+    );
+
+    minttiEventEmitter.addListener('onDisconnected', event => {
+      setMinttiConnected(false);
+      setMinttiConnecting(false);
+      Toast.show({
+        type: 'error',
+        text1: 'Medical device has been diconnected..',
+      });
+    });
+
     createNotificationChannels();
     if (Platform.OS === 'android') SplashScreen.hide();
 
+    checkUpdates();
     hideMeetingNotification();
   }, []);
 
@@ -69,9 +69,15 @@ export default function App() {
     };
   }, []);
 
-  // In app updates
-  useEffect(() => {
-    checkUpdates();
+  const checkUpdates = useCallback(async () => {
+    try {
+      const result = await inAppUpdates.checkNeedsUpdate();
+      if (result.shouldUpdate) {
+        setShowModal(true)
+      }
+    } catch (error) {
+      console.log('In app update: ', error);
+    }
   }, []);
 
   const showAlert = () => {

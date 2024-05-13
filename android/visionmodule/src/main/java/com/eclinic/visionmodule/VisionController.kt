@@ -28,10 +28,10 @@ import com.mintti.visionsdk.ble.callback.IBleScanCallback
 import com.mintti.visionsdk.ble.callback.IBleWriteResponse
 import com.mintti.visionsdk.ble.callback.IBpResultListener
 import com.mintti.visionsdk.ble.callback.IEcgResultListener
+import com.mintti.visionsdk.ble.callback.IRawBpDataCallback
 import com.mintti.visionsdk.ble.callback.ISpo2ResultListener
 import java.util.Timer
 import kotlin.concurrent.schedule
-
 
 class VisionController(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext),
@@ -53,7 +53,11 @@ class VisionController(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun startDeviceScan(msg: String) {
+    fun startDeviceScan(msg: String, promise: Promise) {
+        if (!BleManager.getInstance().isBluetoothEnable) {
+            promise.reject("BluetoothError", "Bluetooth is not enabled ")
+            return
+        }
         startScan()
         println(msg)
     }
@@ -82,6 +86,12 @@ class VisionController(reactContext: ReactApplicationContext) :
 
                 override fun onDisconnected(p0: String?, p1: Boolean) {
                     Log.e(TAG, "Disconnected")
+                    sendEvent(
+                        reactApplicationContext,
+                        "onDisconnected",
+                        Arguments.createMap().apply {
+                            putString("message", "Device is disconnected")
+                        })
                 }
             })
             Timer().schedule(1000) {
@@ -111,17 +121,15 @@ class VisionController(reactContext: ReactApplicationContext) :
             override fun onHeartRate(heartRate: Int) {
                 sendEvent(
                     reactApplicationContext,
-                    "onEcg",
+                    "onEcgHeartRate",
                     Arguments.createMap().apply {
                         putInt("heartRate", heartRate)
                     })
-
             }
-
             override fun onRespiratoryRate(respiratoryRate: Int) {
                 sendEvent(
                     reactApplicationContext,
-                    "onEcg",
+                    "onEcgRespiratoryRate",
                     Arguments.createMap().apply {
                         putInt("respiratoryRate", respiratoryRate)
                     })
@@ -130,7 +138,27 @@ class VisionController(reactContext: ReactApplicationContext) :
             override fun onEcgResult(rrMax: Int, rrMin: Int, hrv: Int) {
                 sendEvent(
                     reactApplicationContext,
-                    "onEcg",
+                    "onEcgResult",
+                    Arguments.createMap().apply {
+                        putMap("results", Arguments.createMap().apply {
+                            putInt("rrMax", rrMax)
+                            putInt("rrMin", rrMin)
+                            putInt("hrv", hrv)
+                        })
+                    })
+                    sendEvent(
+                    reactApplicationContext,
+                    "onEcgResult",
+                    Arguments.createMap().apply {
+                        putMap("results", Arguments.createMap().apply {
+                            putInt("rrMax", rrMax)
+                            putInt("rrMin", rrMin)
+                            putInt("hrv", hrv)
+                        })
+                    })
+                    sendEvent(
+                    reactApplicationContext,
+                    "onEcgResult",
                     Arguments.createMap().apply {
                         putMap("results", Arguments.createMap().apply {
                             putInt("rrMax", rrMax)
@@ -140,10 +168,11 @@ class VisionController(reactContext: ReactApplicationContext) :
                     })
             }
 
+
             override fun onEcgDuration(duration: Int, isEnd: Boolean) {
                 sendEvent(
                     reactApplicationContext,
-                    "onEcg",
+                    "onEcgDuration",
                     Arguments.createMap().apply {
                         putMap("duration", Arguments.createMap().apply {
                             putInt("duration", duration)
@@ -154,6 +183,20 @@ class VisionController(reactContext: ReactApplicationContext) :
         })
         startMeasurements(MeasureType.TYPE_ECG)
     }
+
+    @ReactMethod
+    fun stopSpo2(){
+        stopMeasurements(MeasureType.TYPE_SPO2)
+    }
+    @ReactMethod
+    fun stopECG(){
+        stopMeasurements(MeasureType.TYPE_ECG)
+    }
+    @ReactMethod
+    fun stopBp(){
+        stopMeasurements(MeasureType.TYPE_BP)
+    }
+
 
     @ReactMethod
     fun setTestPaper(manufacturer: String, testPaperCode: String) {
@@ -191,7 +234,7 @@ class VisionController(reactContext: ReactApplicationContext) :
                                 reactApplicationContext,
                                 "onBgEvent",
                                 Arguments.createMap().apply {
-                                    putString("eventType", "bgEventCalibrationFailed")
+                                    putString("event", "bgEventCalibrationFailed")
                                     putString(
                                         "message",
                                         "Calibration failed, pull out the test paper and restart the measurement"
@@ -205,7 +248,7 @@ class VisionController(reactContext: ReactApplicationContext) :
                                 reactApplicationContext,
                                 "onBgEvent",
                                 Arguments.createMap().apply {
-                                    putString("eventType", "bgEventWaitDripBlood")
+                                    putString("event", "bgEventWaitDripBlood")
                                     putString(
                                         "message",
                                         "Waiting for the blood sample to be dripped"
@@ -265,11 +308,18 @@ class VisionController(reactContext: ReactApplicationContext) :
                                 })
                         }
 
-                        BgEvent.BG_EVENT_WAIT_PAGER_INSERT -> Log.e(
-                            TAG,
-                            "bg_event_wait_pager_insert"
-                        )
-
+                        BgEvent.BG_EVENT_WAIT_PAGER_INSERT -> {
+                            sendEvent(
+                                reactApplicationContext,
+                                "onBgEvent",
+                                Arguments.createMap().apply {
+                                    putString("event", "bgEventWaitPagerInsert")
+                                    putString(
+                                        "message",
+                                        "Please insert the pager"
+                                    )
+                                })
+                        }
                         null -> Log.e(TAG, "null")
                     }
                 }
@@ -302,7 +352,7 @@ class VisionController(reactContext: ReactApplicationContext) :
             override fun onSpo2ResultData(heartRate: Int, spo2: Double) {
                 sendEvent(
                     reactApplicationContext,
-                    "onSpo2",
+                    "onSpo2Result",
                     Arguments.createMap().apply {
                         putMap("result", Arguments.createMap().apply {
                             putInt("heartRate", heartRate)
@@ -314,7 +364,7 @@ class VisionController(reactContext: ReactApplicationContext) :
             override fun onSpo2End() {
                 sendEvent(
                     reactApplicationContext,
-                    "onSpo2",
+                    "onSpo2Ended",
                     Arguments.createMap().apply {
                         putBoolean("measurementEnded", true)
                         putString("message", "Spo2 measurement ended")
@@ -326,41 +376,64 @@ class VisionController(reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun measureBloodPressure() {
-        BleManager.getInstance().setBpResultListener(object : IBpResultListener {
-            override fun onBpResult(systolic: Int, diastolic: Int, heartRate: Int) {
-                sendEvent(reactApplicationContext, "onBp", Arguments.createMap().apply {
-                    putMap("result", Arguments.createMap().apply {
-                        putInt("systolic", systolic)
-                        putInt("diastolic", diastolic)
-                        putInt("heartRate", heartRate)
+        BleManager.getInstance().apply {
+            setBpResultListener(object : IBpResultListener {
+                override fun onBpResult(systolic: Int, diastolic: Int, heartRate: Int) {
+                    sendEvent(reactApplicationContext, "onBp", Arguments.createMap().apply {
+                        putMap("result", Arguments.createMap().apply {
+                            putInt("systolic", systolic)
+                            putInt("diastolic", diastolic)
+                            putInt("heartRate", heartRate)
+                        })
                     })
-                })
-            }
+                }
+                override fun onLeadError() {
+                    sendEvent(
+                        reactApplicationContext,
+                        "onBp",
+                        Arguments.createMap().apply {
+                            putString(
+                                "error",
+                                "Air leakage is detected, please check the air circuit and remeasure"
+                            )
+                        })
+                }
 
-            override fun onLeadError() {
-                sendEvent(
-                    reactApplicationContext,
-                    "onBp",
-                    Arguments.createMap().apply {
-                        putString(
-                            "error",
-                            "Air leakage is detected, please check the air circuit and remeasure"
-                        )
-                    })
-            }
+                override fun onBpError() {
+                    sendEvent(
+                        reactApplicationContext,
+                        "onBp",
+                        Arguments.createMap().apply {
+                            putString(
+                                "error",
+                                "This result is invalid, please remeasure"
+                            )
+                        })
+                }
 
-            override fun onBpError() {
-                sendEvent(
-                    reactApplicationContext,
-                    "onBp",
-                    Arguments.createMap().apply {
-                        putString(
-                            "error",
-                            "This result is invalid, please remeasure"
-                        )
+
+            })
+            setRawBpDataCallback(object : IRawBpDataCallback {
+                override fun onPressurizationData(pressurizationData: Short) {
+                    sendEvent(reactApplicationContext, "onBpRaw", Arguments.createMap().apply {
+                        putInt("pressurizationData", pressurizationData.toInt())
                     })
-            }
-        })
+
+                }
+
+                override fun onDecompressionData(decompressionData: Short) {
+                    sendEvent(reactApplicationContext, "onBpRaw", Arguments.createMap().apply {
+                        putInt("decompressionData", decompressionData.toInt())
+                    })
+                }
+
+                override fun onPressure(pressureData: Short) {
+                    sendEvent(reactApplicationContext, "onBpRaw", Arguments.createMap().apply {
+                        putInt("pressureData", pressureData.toInt())
+                    })
+                }
+            })
+        }
         startMeasurements(MeasureType.TYPE_BP)
     }
 
@@ -378,6 +451,18 @@ class VisionController(reactContext: ReactApplicationContext) :
         startMeasurements(MeasureType.TYPE_BT)
     }
 
+    private fun stopMeasurements(measureType: MeasureType){
+        BleManager.getInstance().stopMeasure(measureType, object : IBleWriteResponse {
+            override fun onWriteSuccess() {
+                Log.e(TAG, "startMeasurments>>write success")
+            }
+
+            override fun onWriteFailed() {
+                Log.e(TAG, "startMeasurments>>write failed")
+            }
+
+        })
+    }
     private fun startMeasurements(measureType: MeasureType) {
         BleManager.getInstance().startMeasure(measureType, object : IBleWriteResponse {
             override fun onWriteSuccess() {
@@ -392,11 +477,9 @@ class VisionController(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun stopMeasurements() {
-//        BleManager.getInstance().sto()
-
+    fun stopScan() {
+        BleManager.getInstance().stopScan()
     }
-
 
     @ReactMethod
     fun getBattery(promise: Promise) {
@@ -409,7 +492,6 @@ class VisionController(reactContext: ReactApplicationContext) :
         }
     }
 
-
     private fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
         reactContext
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
@@ -417,6 +499,9 @@ class VisionController(reactContext: ReactApplicationContext) :
     }
 
     private fun startScan() {
+
+
+
         Log.i("startScan", "start")
         mHandler?.sendEmptyMessageDelayed(MSG_SCAN_DELAY, 10 * 1000);
         Log.i("startScan>>", "after mHandler")

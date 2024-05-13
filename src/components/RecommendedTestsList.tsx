@@ -122,8 +122,11 @@ function Item({
         appointmentTestId: AppointmentTestId,
       });
       const screen = mapTestUrl(TestName);
-      if (isMinttiConnected && screen !== 'MinttiInitalization')
-        navigation.navigate(screen);
+      if (!isMinttiConnected || screen === 'MinttiInitalization')
+        navigation.navigate('MinttiInitalization', {
+          testRoute: mapTestUrl(TestName),
+        });
+      else if (isMinttiConnected) navigation.navigate(screen);
       else
         navigation.navigate('MinttiInitalization', {
           testRoute: mapTestUrl(TestName),

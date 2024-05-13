@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { useEffect, useState } from 'react';
-import { NativeEventEmitter, NativeModules, ToastAndroid } from 'react-native';
+import {useEffect, useState} from 'react';
+import {NativeEventEmitter, NativeModules, ToastAndroid} from 'react-native';
 import {
   AndroidLocationEnablerResult,
   isLocationEnabled,
@@ -8,7 +8,7 @@ import {
 } from 'react-native-android-location-enabler';
 import BluetoothStateManager from 'react-native-bluetooth-state-manager';
 import Toast from 'react-native-toast-message';
-import { useMinttiVisionStore } from '../../utils/store/useMinttiVisionStore';
+import {useMinttiVisionStore} from '../../utils/store/useMinttiVisionStore';
 
 const {VisionModule} = NativeModules;
 
@@ -51,7 +51,8 @@ const useMinttiVision = ({
       },
     );
     const disconnectEventListener = eventEmitter.addListener(
-      'onDisconnected',  event => {
+      'onDisconnected',
+      event => {
         setIsConnected(false);
         setIsConnecting(false);
         Toast.show({
@@ -82,7 +83,10 @@ const useMinttiVision = ({
       250,
     );
 
-    const bpRawListener = eventEmitter.addListener('onBpRaw', throttledBpRawListener);
+    const bpRawListener = eventEmitter.addListener(
+      'onBpRaw',
+      throttledBpRawListener,
+    );
 
     const spo2Listener = eventEmitter.addListener('onSpo2', event => {
       onSpo2 && onSpo2(event);
@@ -267,9 +271,13 @@ const useMinttiVision = ({
   }
 
   async function stopSpo2() {
-    console.log('Stop sp02 called...');
-    setIsMeasuring(false);
-    await VisionModule.stopSpo2();
+    try {
+      console.log('Stop sp02 called...');
+      setIsMeasuring(false);
+      await VisionModule.stopSpo2();
+    } catch (error) {
+      console.log('stop spo2 : ', error);
+    }
   }
 
   async function measureECG() {
@@ -297,8 +305,12 @@ const useMinttiVision = ({
   }
 
   async function stopScan() {
-    VisionModule.stopScan();
-    setIsScanning(false);
+    try {
+      VisionModule.stopScan();
+      setIsScanning(false);
+    } catch (error) {
+      console.log('Error: ', error);
+    }
   }
 
   return {
