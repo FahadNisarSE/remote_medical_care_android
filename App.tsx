@@ -15,15 +15,28 @@ import {StethoScopeProvider} from './src/nativemodules/SmarthoStethoScope/useSte
 import AppNavigation from './src/utils/AppNavigation';
 import {hideMeetingNotification} from './src/utils/pushNotification';
 import {useMinttiVisionStore} from './src/utils/store/useMinttiVisionStore';
+import DeviceInfo from 'react-native-device-info';
 
 const inAppUpdates = new SpInAppUpdates(true);
 
 export const queryClient = new QueryClient();
 
+async function getCarrier() {
+  const name = await DeviceInfo.getCarrier();
+  const value = await NetInfo.fetch();
+
+  console.log("Net info: ", value)
+
+  console.log('Carrier Info: ', name);
+}
+
 export default function App() {
   const [connected, setConnected] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const { setIsConnected: setMinttiConnected, setIsConnecting: setMinttiConnecting } = useMinttiVisionStore();
+  const {
+    setIsConnected: setMinttiConnected,
+    setIsConnecting: setMinttiConnecting,
+  } = useMinttiVisionStore();
 
   const createNotificationChannels = useCallback(() => {
     PushNotification.createChannel(
@@ -33,7 +46,7 @@ export default function App() {
       },
       result => {},
     );
-  }, [])
+  }, []);
 
   useEffect(() => {
     const minttiEventEmitter = new NativeEventEmitter(
@@ -51,6 +64,7 @@ export default function App() {
 
     createNotificationChannels();
     if (Platform.OS === 'android') SplashScreen.hide();
+    getCarrier();
 
     checkUpdates();
     hideMeetingNotification();
@@ -73,7 +87,7 @@ export default function App() {
     try {
       const result = await inAppUpdates.checkNeedsUpdate();
       if (result.shouldUpdate) {
-        setShowModal(true)
+        setShowModal(true);
       }
     } catch (error) {
       console.log('In app update: ', error);

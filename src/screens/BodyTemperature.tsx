@@ -1,19 +1,19 @@
 import {DrawerToggleButton} from '@react-navigation/drawer';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   BackHandler,
   Image,
   Modal,
   Pressable,
-  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {queryClient} from '../../App';
 import useSaveTestResults from '../api/action/useSaveTestResult';
+import AppUpdating from '../components/AppUpdating';
 import BatteryIndicator from '../components/BatteryIndicatory';
 import Button from '../components/ui/Button';
 import CustomTextRegular from '../components/ui/CustomTextRegular';
@@ -24,7 +24,6 @@ import {meetingStyles} from '../styles/style';
 import {HomeStackNavigatorParamList} from '../utils/AppNavigation';
 import {useAppointmentDetailStore} from '../utils/store/useAppointmentDetailStore';
 import {useMinttiVisionStore} from '../utils/store/useMinttiVisionStore';
-import AppUpdating from '../components/AppUpdating';
 
 type BloodOxygenProps = NativeStackScreenProps<
   HomeStackNavigatorParamList,
@@ -38,11 +37,6 @@ export default function BodyTemperature({navigation}: BloodOxygenProps) {
   const {measureBodyTemperature} = useMinttiVision({});
   const {temperature, setTemperature, isConnected, battery, isMeasuring} =
     useMinttiVisionStore();
-
-  // Reset Values
-  // useEffect(() => {
-  //   setTemperature(0);
-  // }, []);
 
   function handleTestInProgress() {
     Alert.alert(
@@ -239,11 +233,13 @@ export default function BodyTemperature({navigation}: BloodOxygenProps) {
         animationType="slide"
         transparent={true}
         onRequestClose={() => {
+          if (isPending) return;
           setTemperature(0);
           toggleModal(false);
         }}>
         <Pressable
           onPress={() => {
+            if (isPending) return;
             setTemperature(0);
             toggleModal(false);
           }}
@@ -319,6 +315,7 @@ export default function BodyTemperature({navigation}: BloodOxygenProps) {
               <View className="flex flex-row justify-end mt-auto">
                 <TouchableOpacity
                   onPress={reTakeTesthandler}
+                  disabled={isPending}
                   className="px-4 py-2 border rounded-md border-text">
                   <CustomTextRegular className="text-center text-text">
                     Retake Test

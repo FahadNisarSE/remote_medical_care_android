@@ -292,11 +292,15 @@ export default function BloodOxygen({navigation}: BloodOxygenProps) {
         animationType="slide"
         transparent={true}
         onRequestClose={() => {
+          if (isPending) return;
+
           setSpO2Result(undefined);
           toggleModal(false);
         }}>
         <Pressable
           onPress={() => {
+            if (isPending) return;
+
             setSpO2Result(undefined);
             toggleModal(false);
           }}
@@ -366,6 +370,7 @@ export default function BloodOxygen({navigation}: BloodOxygenProps) {
               <View className="flex flex-row justify-end mt-auto">
                 <TouchableOpacity
                   onPress={reTakeTesthandler}
+                  disabled={isPending}
                   className="px-4 py-2 border rounded-md border-text">
                   <CustomTextRegular className="text-center text-text">
                     Retake Test

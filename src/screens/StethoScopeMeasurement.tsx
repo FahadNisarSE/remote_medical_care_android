@@ -76,8 +76,6 @@ export default function StethoScopeMeasurement({
   const cameraRef = useRef<Camera>(null);
   const [videoRecord, setVideoRecord] = useState<RecordingResponse>();
   const [allowedPermission, setAllowedPermission] = useState(hasPermission);
-  const {mutate: SaveVideo, isPending: uploadingVideo} =
-    useSaveSelfAssessment();
   const [consentModal, setConsentModal] = useState(true);
   const {isOngoingMeeting} = useMeetingOngoingStore();
 
@@ -482,7 +480,6 @@ export default function StethoScopeMeasurement({
                   width: width * 0.3,
                   height: width * 0.5,
                 }}
-                
                 video={true}
                 audio={false}
                 onError={error => {
@@ -509,7 +506,7 @@ export default function StethoScopeMeasurement({
         animationType="slide"
         transparent={true}
         onRequestClose={async () => {
-          if (isPending || uploadingVideo) return;
+          if (isPending) return;
           toggleModal(false);
           await retakeTestHandler();
         }}>
@@ -546,13 +543,6 @@ export default function StethoScopeMeasurement({
               </CustomTextRegular>
               <View className="flex flex-row justify-end">
                 <TouchableOpacity
-                  onPress={() => {}}
-                  className="flex-1 px-4 py-3 border rounded-md border-text">
-                  <CustomTextSemiBold className="text-center text-text">
-                    Privacy Policy
-                  </CustomTextSemiBold>
-                </TouchableOpacity>
-                <TouchableOpacity
                   onPress={() => setConsentModal(false)}
                   disabled={isPending}
                   className="flex-1 px-4 py-3 ml-2 border rounded-md bg-primmary border-primmary">
@@ -572,10 +562,14 @@ export default function StethoScopeMeasurement({
         animationType="slide"
         transparent={true}
         onRequestClose={() => {
+          if (isPending) return;
           toggleModal(false);
         }}>
         <Pressable
-          onPress={() => toggleModal(false)}
+          onPress={() => {
+            if (isPending) return;
+            toggleModal(false);
+          }}
           className="w-full h-full bg-black opacity-25"></Pressable>
         <View
           style={{
@@ -627,6 +621,7 @@ export default function StethoScopeMeasurement({
                     setHeartRateArray([]);
                     setShowModal(false);
                   }}
+                  disabled={isPending}
                   className="px-4 py-2 border rounded-md border-text">
                   <CustomTextRegular className="text-center text-text">
                     Retake Test

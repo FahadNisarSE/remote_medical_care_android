@@ -149,7 +149,7 @@ export default function BloodGlucose({navigation}: BloodOxygenProps) {
       {
         AppointmentTestId: appointmentTestId!,
         VariableName: ['Blood Glucose'],
-        VariableValue: [`${bgResult} mmol/L`],
+        VariableValue: [`${bgResult?.bg} mmol/L`],
       },
       {
         onError: () => {
@@ -293,11 +293,13 @@ export default function BloodGlucose({navigation}: BloodOxygenProps) {
         animationType="slide"
         transparent={true}
         onRequestClose={() => {
+          if (isPending) return;
           reTakeTesthandler();
           toggleModal(false);
         }}>
         <Pressable
           onPress={() => {
+            if (isPending) return;
             reTakeTesthandler();
             toggleModal(false);
           }}
@@ -372,6 +374,7 @@ export default function BloodGlucose({navigation}: BloodOxygenProps) {
               <View className="flex flex-row justify-end mt-auto">
                 <TouchableOpacity
                   onPress={reTakeTesthandler}
+                  disabled={isPending}
                   className="px-4 py-2 border rounded-md border-text">
                   <CustomTextRegular className="text-center text-text">
                     Retake Test

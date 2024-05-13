@@ -1,6 +1,6 @@
-import { DrawerToggleButton } from '@react-navigation/drawer';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useEffect, useRef, useState } from 'react';
+import {DrawerToggleButton} from '@react-navigation/drawer';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Alert,
   BackHandler,
@@ -8,10 +8,10 @@ import {
   Modal,
   Pressable,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { queryClient } from '../../App';
+import {queryClient} from '../../App';
 import useSaveTestResults from '../api/action/useSaveTestResult';
 import AppUpdating from '../components/AppUpdating';
 import BatteryIndicator from '../components/BatteryIndicatory';
@@ -20,16 +20,13 @@ import CustomTextRegular from '../components/ui/CustomTextRegular';
 import CustomTextSemiBold from '../components/ui/CustomTextSemiBold';
 import EcgChart from '../nativemodules/MinttiVision/EcgChart';
 import useMinttiVision from '../nativemodules/MinttiVision/useMinttiVision';
-import { meetingStyles } from '../styles/style';
-import { HomeStackNavigatorParamList } from '../utils/AppNavigation';
-import { useAppointmentDetailStore } from '../utils/store/useAppointmentDetailStore';
-import { useMinttiVisionStore } from '../utils/store/useMinttiVisionStore';
-import { calculateAverage } from '../utils/utilityFunctions';
+import {meetingStyles} from '../styles/style';
+import {HomeStackNavigatorParamList} from '../utils/AppNavigation';
+import {useAppointmentDetailStore} from '../utils/store/useAppointmentDetailStore';
+import {useMinttiVisionStore} from '../utils/store/useMinttiVisionStore';
+import {calculateAverage} from '../utils/utilityFunctions';
 
-type ECGProps = NativeStackScreenProps<
-  HomeStackNavigatorParamList,
-  'ECG'
->;
+type ECGProps = NativeStackScreenProps<HomeStackNavigatorParamList, 'ECG'>;
 
 export default function ECG({navigation}: ECGProps) {
   const ecgChartRef = useRef();
@@ -294,11 +291,15 @@ export default function ECG({navigation}: ECGProps) {
         animationType="slide"
         transparent={true}
         onRequestClose={() => {
+          if (isPending) return;
+
           resetSate();
           toggleModal(false);
         }}>
         <Pressable
           onPress={() => {
+            if (isPending) return;
+
             resetSate();
             toggleModal(false);
           }}
@@ -359,6 +360,7 @@ export default function ECG({navigation}: ECGProps) {
               <View className="flex flex-row justify-end mt-auto">
                 <TouchableOpacity
                   onPress={reTakeTesthandler}
+                  disabled={isPending}
                   className="px-4 py-2 border rounded-md border-text">
                   <CustomTextRegular className="text-center text-text">
                     Retake Test

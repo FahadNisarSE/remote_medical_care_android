@@ -70,19 +70,19 @@ export default function CustomDrawer(props: DrawerContentComponentProps) {
         <DrawerItem
           {...props}
           style={{marginTop: 4, marginHorizontal: 12}}
-          label="About us"
-          focused={isRouteActive('AboutUs')}
+          label="About"
+          focused={isRouteActive('About')}
           activeBackgroundColor="#46b98d"
           activeTintColor="#000000"
           labelStyle={{fontFamily: 'Inter-SemiBold', color: 'white'}}
           icon={() => (
             <Image
               source={require('../assets/icons/information.png')}
-              alt="AboutUs"
+              alt="About"
               style={{width: 17, height: 17}}
             />
           )}
-          onPress={() => props.navigation.navigate('AboutUs')}
+          onPress={() => props.navigation.navigate('About')}
         />
       </DrawerContentScrollView>
       <Pressable

@@ -29,7 +29,7 @@ async function saveDeramtoScopeImage(data: {
       const camera_image = cameraImage[i];
       formData.append(`VariableName[${i + galleryImage.length}]`, variableName);
       formData.append(`VariableValue[${i + galleryImage.length}]`, {
-        uri: camera_image.path,
+        uri: 'file://' + camera_image.path,
         name: 'camera_image' + appointmentTestId + i,
         type: 'type/heci',
       });

@@ -122,6 +122,7 @@ function Item({
         appointmentTestId: AppointmentTestId,
       });
       const screen = mapTestUrl(TestName);
+      console.log('Screen: ', screen);
       if (!isMinttiConnected || screen === 'MinttiInitalization')
         navigation.navigate('MinttiInitalization', {
           testRoute: mapTestUrl(TestName),
@@ -168,11 +169,7 @@ function Item({
             onPress={onPressHanlder}
             className="flex items-center justify-center p-2 my-auto rounded bg-accent">
             <CustomTextRegular className="text-xs text-white">
-              {DeviceName === 'Digital Stethoscope' ||
-              DeviceName === 'Self Assessment' ||
-              DeviceName === 'Dermatoscope'
-                ? 'Start Test'
-                : 'Other App'}
+              Start Test
             </CustomTextRegular>
           </TouchableOpacity>
         )}

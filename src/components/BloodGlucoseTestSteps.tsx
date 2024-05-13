@@ -23,7 +23,7 @@ export default function BloodGlucoseIntructionMap(
               alt="sugar strips"
             />
             <View className="mt-auto mb-4">
-              <CustomTextRegular className="text-center">
+              <CustomTextRegular className="text-center text-text">
                 Please insert the blood glucose test strip into the blood
                 glucose test port of the device.
               </CustomTextRegular>
@@ -49,7 +49,7 @@ export default function BloodGlucoseIntructionMap(
               alt="sugar strips"
             />
             <View className="mt-auto mb-4">
-              <CustomTextRegular className="text-center">
+              <CustomTextRegular className="text-center text-text">
                 Wait for blood sample, please contact blood glucose test strip
                 with blood.
               </CustomTextRegular>
@@ -72,7 +72,7 @@ export default function BloodGlucoseIntructionMap(
             </View>
 
             <View className="mt-auto mb-4">
-              <CustomTextRegular className="text-center">
+              <CustomTextRegular className="text-center text-text">
                 A blood sample has been collected, please wait
               </CustomTextRegular>
             </View>
@@ -97,7 +97,7 @@ export default function BloodGlucoseIntructionMap(
               alt="sugar strips"
             />
             <View className="mt-auto mb-4">
-              <CustomTextRegular className="text-center">
+              <CustomTextRegular className="text-center text-text">
                 Sorry! But it seems that someting went wrong. Please restart the
                 test again.
               </CustomTextRegular>
@@ -115,7 +115,7 @@ export default function BloodGlucoseIntructionMap(
             </CustomTextRegular>
           </View>
           <View className="flex-1 mt-4">
-            <View className='items-center justify-center flex-1'>
+            <View className="items-center justify-center flex-1">
               <Image
                 className="w-1/2 h-40 m-auto"
                 style={{objectFit: 'contain'}}
@@ -124,7 +124,7 @@ export default function BloodGlucoseIntructionMap(
               />
             </View>
             <View className="mt-auto mb-4">
-              <CustomTextRegular className="text-center">
+              <CustomTextRegular className="text-center text-text">
                 Sorry! But it seems that someting went wrong. Please restart the
                 test again.
               </CustomTextRegular>

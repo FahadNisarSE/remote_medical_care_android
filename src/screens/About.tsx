@@ -31,7 +31,7 @@ import axios from 'axios';
 const fetchRemoteFile = async (url: string) => {
   try {
     const response = await axios.get(url, {
-      responseType: 'arraybuffer', // Ensure response is treated as binary data
+      responseType: 'arraybuffer',
     });
     console.log('REsponse: ', response);
     return Buffer.from(response.data, 'binary').toString('base64');
@@ -126,6 +126,7 @@ export default function About({navigation}: AboutProps) {
           }
           className="px-5"
         />
+        <Button onPress={() => navigation.navigate('BloodOxygen')} text='Blood Oxygen'/>
       </View>
     </>
   );

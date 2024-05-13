@@ -23,6 +23,7 @@ import BloodGlucose from '../screens/BloodGlucose';
 import BloodPressure from '../screens/BloodPressure';
 import BloodOxygen from '../screens/BloodOxygen';
 import ECG from '../screens/ECG';
+import Instructions from '../screens/Instrunctions';
 
 export type HomeStackNavigatorParamList = {
   Home: undefined;
@@ -56,6 +57,9 @@ export type HomeStackNavigatorParamList = {
   BodyTemperature: undefined;
   BloodGlucose: undefined;
   BloodPressure: undefined;
+  Instructions: {
+    testType: string;
+  };
   BloodOxygen: undefined;
   ECG: undefined;
 };
@@ -152,6 +156,11 @@ export default function AppNavigation() {
               <Drawer.Screen
                 name="ECG"
                 component={ECG}
+                options={{headerShown: false}}
+              />
+              <Drawer.Screen
+                name="Instructions"
+                component={Instructions}
                 options={{headerShown: false}}
               />
               <Drawer.Screen
