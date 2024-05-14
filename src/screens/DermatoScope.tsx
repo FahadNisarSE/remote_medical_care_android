@@ -21,6 +21,7 @@ import Toast from 'react-native-toast-message';
 import {
   Camera,
   PhotoFile,
+  getCameraDevice,
   useCameraDevice,
   useCameraPermission,
 } from 'react-native-vision-camera';
@@ -48,20 +49,28 @@ export default function DermatoScope({navigation, route}: DermatoScopeProps) {
   const isActive = isFocused && AppState.currentState === 'active';
   const cameraRef = useRef<Camera>(null);
   const [isInitalized, setIsInitalized] = useState(false);
-  const [galleryImage, setGalleryImage] = useState<DocumentPickerResponse[]>([]);
+  const [galleryImage, setGalleryImage] = useState<DocumentPickerResponse[]>(
+    [],
+  );
   const [cameraImage, setCameraImage] = useState<PhotoFile[]>([]);
   const {mutate, isPending} = useSaveDermatoScopeImages();
   const {appointmentDetail} = useAppointmentDetailStore();
   const [takingPhoto, setTakingPhoto] = useState(false);
   const [instructionModal, setInstructionModal] = useState(true);
 
-  const device = useCameraDevice('back');
+  const devices = useRef(Camera.getAvailableCameraDevices());
+  const [device, setDevice] = useState(
+    getCameraDevice(devices.current, 'back'),
+  );
+  const errorRef = useRef('');
 
   const {appointmentTestId, testName} = route.params;
 
   async function requestCameraPermissions() {
     const result = await requestPermission();
     setAllowedPermission(result);
+    devices.current = Camera.getAvailableCameraDevices();
+    setDevice(getCameraDevice(devices.current, 'back'));
   }
 
   async function saveResult() {
@@ -280,31 +289,45 @@ export default function DermatoScope({navigation, route}: DermatoScopeProps) {
         </View>
         <DrawerToggleButton />
       </View>
-      <Camera
-        className="my-4"
-        style={{
-          width: width * 0.9,
-          height: height * 0.5,
-          display:
-            isInitalized && (hasPermission || allowedPermission)
-              ? 'flex'
-              : 'none',
-        }}
-        device={device!}
-        onError={error => {
-          Toast.show({
-            type: 'error',
-            text1: "Couldn't access camera",
-            text2: error.message,
-          });
-
-          console.log('first', error);
-        }}
-        onInitialized={() => setIsInitalized(true)}
-        ref={cameraRef}
-        photo={true}
-        isActive={isActive}
-      />
+      {(hasPermission || allowedPermission) && (
+        <Camera
+          className="my-4"
+          style={{
+            width: width * 0.9,
+            height: height * 0.5,
+            display:
+              isInitalized && (hasPermission || allowedPermission)
+                ? 'flex'
+                : 'none',
+          }}
+          device={device!}
+          onError={error => {
+            if (
+              error.code === 'session/camera-cannot-be-opened' ||
+              (error.name === 'session/camera-cannot-be-opened' &&
+                !errorRef.current)
+            ) {
+              errorRef.current = error.code;
+              devices.current = Camera.getAvailableCameraDevices();
+              setDevice(getCameraDevice(devices.current, 'front'));
+              setTimeout(
+                () => setDevice(getCameraDevice(devices.current, 'back')),
+                1000,
+              );
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: "Couldn't access camera",
+                text2: error.message,
+              });
+            }
+          }}
+          onInitialized={() => setIsInitalized(true)}
+          ref={cameraRef}
+          photo={true}
+          isActive={isActive}
+        />
+      )}
       {(!isInitalized || !hasPermission || !allowedPermission) && (
         <View
           className="items-center justify-center flex-1 mx-auto my-4 rounded-lg bg-slate-800"
@@ -318,10 +341,10 @@ export default function DermatoScope({navigation, route}: DermatoScopeProps) {
           <CustomTextRegular
             style={{width: width * 0.6}}
             className="mx-auto mt-2 text-base text-center text-white">
-            {!isInitalized
-              ? 'Three was an error while starting camera'
-              : !hasPermission
-              ? 'Please allow camera permissions for camera to work'
+            {!hasPermission
+              ? 'Please allow camera permissions for camera to work.'
+              : !isInitalized
+              ? 'Three was an error while starting camera.'
               : 'Whoops! Something went wrong.'}
           </CustomTextRegular>
         </View>

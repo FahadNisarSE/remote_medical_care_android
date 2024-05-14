@@ -3,6 +3,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useEffect, useRef, useState} from 'react';
 import {
+  AppState,
   Dimensions,
   Image,
   Pressable,
@@ -42,22 +43,29 @@ export default function SelfAssessment({navigation, route}: TakePhotosProps) {
   const {hasPermission, requestPermission} = useCameraPermission();
   const [allowedPermission, setAllowedPermission] = useState(hasPermission);
   const isFocused = useIsFocused();
-  const cameraRef = useRef<Camera>(null);
+  const isActive = isFocused && AppState.currentState === 'active';
   const [isInitalized, setIsInitalized] = useState(false);
   const [galleryImage, setGalleryImage] =
     useState<DocumentPickerResponse | null>(null);
   const [cameraImage, setCameraImage] = useState<PhotoFile | undefined>();
   const {mutate, isPending} = useSaveSelfAssessment();
-  const {appointmentDetail} = useAppointmentDetailStore();
-  const devices = useCameraDevices();
-  const [device, setDevice] = useState(getCameraDevice(devices, 'back'));
+  const devices = useRef(Camera.getAvailableCameraDevices());
+  const [device, setDevice] = useState(
+    getCameraDevice(devices.current, 'back'),
+  );
   const [takingPhoto, setTakingPhoto] = useState(false);
+
+  const {appointmentDetail} = useAppointmentDetailStore();
+  const cameraRef = useRef<Camera>(null);
+  const errorRef = useRef('');
 
   const {appointmentTestId, testName} = route.params;
 
   async function requestCameraPermissions() {
     const result = await requestPermission();
     setAllowedPermission(result);
+    devices.current = Camera.getAvailableCameraDevices();
+    setDevice(getCameraDevice(devices.current, 'back'));
   }
 
   async function saveResult() {
@@ -215,31 +223,48 @@ export default function SelfAssessment({navigation, route}: TakePhotosProps) {
         </View>
         <DrawerToggleButton />
       </View>
-      <Camera
-        className="my-4"
-        style={{
-          width: width * 0.9,
-          height: height * 0.5,
-          display: isInitalized && (hasPermission || allowedPermission)? 'flex' : 'none',
-        }}
-        device={device!}
-        onError={error => {
-          Toast.show({
-            type: 'error',
-            text1: "Couldn't access camera",
-            text2: error.message,
-          });
-
-          console.log('first', error);
-        }}
-        onInitialized={() => setIsInitalized(true)}
-        ref={cameraRef}
-        photo={true}
-        isActive={
-          navigation.getState().routes[navigation.getState().index].name ===
-          'SelfAssessment'
-        }
-      />
+      {(hasPermission || allowedPermission) && (
+        <Camera
+          className="my-4"
+          style={{
+            width: width * 0.9,
+            height: height * 0.5,
+            display:
+              isInitalized && (hasPermission || allowedPermission)
+                ? 'flex'
+                : 'none',
+          }}
+          device={device!}
+          onError={error => {
+            if (
+              error.code === 'session/camera-cannot-be-opened' ||
+              (error.name === 'session/camera-cannot-be-opened' &&
+                !errorRef.current)
+            ) {
+              errorRef.current = error.code;
+              devices.current = Camera.getAvailableCameraDevices();
+              setDevice(getCameraDevice(devices.current, 'front'));
+              setTimeout(
+                () => setDevice(getCameraDevice(devices.current, 'back')),
+                1000,
+              );
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: "Couldn't access camera",
+                text2: error.message,
+              });
+            }
+          }}
+          onInitialized={() => setIsInitalized(true)}
+          ref={cameraRef}
+          photo={true}
+          isActive={
+            navigation.getState().routes[navigation.getState().index].name ===
+              'SelfAssessment' && isActive
+          }
+        />
+      )}
       {(!isInitalized || !hasPermission || !allowedPermission) && (
         <View
           className="items-center justify-center flex-1 mx-auto my-4 rounded-lg bg-slate-800"
@@ -253,10 +278,10 @@ export default function SelfAssessment({navigation, route}: TakePhotosProps) {
           <CustomTextRegular
             style={{width: width * 0.6}}
             className="mx-auto mt-2 text-base text-center text-white">
-            {!isInitalized
-              ? 'Three was an error while starting camera'
-              : !hasPermission
-              ? 'Please allow camera permissions for camera to work'
+            {!hasPermission
+              ? 'Please allow camera permissions for camera to work.'
+              : !isInitalized
+              ? 'Three was an error while starting camera.'
               : 'Whoops! Something went wrong.'}
           </CustomTextRegular>
         </View>

@@ -145,8 +145,9 @@ const AppointmentMeeting = ({navigation}: LiveMeetingProps) => {
   }, [isJoined]);
 
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', function () {
+    BackHandler.addEventListener('hardwareBackPress', () => {
       if (!isJoined) agoraEngineRef.current?.stopPreview();
+      console.log('back handler pressed: ', {isJoined});
       navigation.goBack();
       return true;
     });
