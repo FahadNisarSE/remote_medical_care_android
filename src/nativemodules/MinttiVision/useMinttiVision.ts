@@ -36,6 +36,7 @@ const useMinttiVision = ({
     setIsConnecting,
     setIsScanning,
     setIsMeasuring,
+    isConnected,
     setIsConnected,
   } = useMinttiVisionStore();
 
@@ -153,6 +154,10 @@ const useMinttiVision = ({
       ecgRespiratoryRateListener.remove();
     };
   }, []);
+
+  const disconnectFromDevice = async () => {
+    if (isConnected) VisionModule.disconnect();
+  };
 
   const discoverDevices = async () => {
     try {
@@ -326,6 +331,7 @@ const useMinttiVision = ({
     getBattery,
     connectToDevice,
     stopScan,
+    disconnectFromDevice,
     discoveredDevices,
     connectedDevice,
   };

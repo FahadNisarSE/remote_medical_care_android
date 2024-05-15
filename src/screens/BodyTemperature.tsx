@@ -38,8 +38,6 @@ export default function BodyTemperature({navigation}: BloodOxygenProps) {
   const {temperature, setTemperature, isConnected, battery, isMeasuring} =
     useMinttiVisionStore();
 
-  console.log('is Connected: ', isConnected);
-
   function handleTestInProgress() {
     Alert.alert(
       'Test in Progress',

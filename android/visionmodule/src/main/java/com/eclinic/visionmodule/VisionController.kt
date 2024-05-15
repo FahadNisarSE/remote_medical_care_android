@@ -63,6 +63,11 @@ class VisionController(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
+    fun disconnect(){
+        BleManager.getInstance().disconnect()
+    }
+
+    @ReactMethod
     fun connectToDevice(device: ReadableMap, promise: Promise) {
         val mac = device.getString("mac");
         if (mac.isNullOrBlank() || device.getString("name").isNullOrBlank()) {

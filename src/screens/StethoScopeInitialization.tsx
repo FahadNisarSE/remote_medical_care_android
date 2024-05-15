@@ -20,6 +20,8 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {HomeStackNavigatorParamList} from '../utils/AppNavigation';
 import {useSmarthoInitialization} from '../utils/store/useSmarthoInitalization';
 import AppUpdating from '../components/AppUpdating';
+import useMinttiVision from '../nativemodules/MinttiVision/useMinttiVision';
+import Button from '../components/ui/Button';
 
 const dimension = Dimensions.get('window');
 
@@ -48,6 +50,7 @@ export default function StethoScopeInitialization({
     deviceList,
     connectToDevice,
   } = useContext(StethoScopeContext) || defaultValue;
+  const {disconnectFromDevice} = useMinttiVision({});
 
   const {isConnected, setTestName, setAppointmentTestId} =
     useSmarthoInitialization();
@@ -110,33 +113,40 @@ export default function StethoScopeInitialization({
         <FlatList
           data={deviceList}
           keyExtractor={item => item.mac}
-          renderItem={({item}) => (
-            <View className="flex-row flex-1 px-2 py-3 mt-2 rounded-lg bg-background">
-              <View className="items-center justify-center p-2 mr-2 overflow-hidden rounded-full bg-primmary">
-                <Image
-                  className="w-5 h-5"
-                  source={require('../assets/icons/activity.png')}
-                />
+          renderItem={({item}) =>
+            item.name === 'Mintti' ? (
+              <View className="flex-row flex-1 px-2 py-3 mt-2 rounded-lg bg-background">
+                <View className="items-center justify-center p-2 mr-2 overflow-hidden rounded-full bg-primmary">
+                  <Image
+                    className="w-5 h-5"
+                    source={require('../assets/icons/activity.png')}
+                  />
+                </View>
+                <View className="flex-1">
+                  <CustomTextSemiBold className="text-text">
+                    {item.name}
+                  </CustomTextSemiBold>
+                  <CustomTextRegular className="text-text">
+                    {item.mac}
+                  </CustomTextRegular>
+                </View>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  disabled={isConnecting}
+                  onPress={async () => {
+                    await disconnectFromDevice();
+                    connectToDevice(item, () => {});
+                  }}
+                  className="flex items-center justify-center p-2 my-auto rounded bg-primmary">
+                  <CustomTextRegular className="text-xs text-white">
+                    {isConnecting ? 'Connecting' : 'Connect'}
+                  </CustomTextRegular>
+                </TouchableOpacity>
               </View>
-              <View className="flex-1">
-                <CustomTextSemiBold className="text-text">
-                  {item.name}
-                </CustomTextSemiBold>
-                <CustomTextRegular className="text-text">
-                  {item.mac}
-                </CustomTextRegular>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                disabled={isConnecting}
-                onPress={() => connectToDevice(item, () => {})}
-                className="flex items-center justify-center p-2 my-auto rounded bg-primmary">
-                <CustomTextRegular className="text-xs text-white">
-                  {isConnecting ? 'Connecting' : 'Connect'}
-                </CustomTextRegular>
-              </TouchableOpacity>
-            </View>
-          )}
+            ) : (
+              <></>
+            )
+          }
         />
         <View className="p-4 my-5 mt-auto rounded-xl bg-primmary">
           <CustomTextSemiBold className="mb-2 text-xl text-center text-white">

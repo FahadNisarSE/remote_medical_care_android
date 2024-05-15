@@ -127,7 +127,7 @@ export function useStethoScope(): StethoScopeContextType {
         setIsMeasuring(false);
         Toast.show({
           type: 'error',
-          text1: 'Oops! Digital Stethoscope has been disconnected.',
+          text1: 'Digital Stethoscope has been disconnected.',
         });
       },
     );
@@ -151,6 +151,10 @@ export function useStethoScope(): StethoScopeContextType {
       if (device.mac === devices[0]?.mac) return devices;
       return [...devices, device];
     });
+  }
+
+  async function disconnectStethoScope() {
+    if (isConnected) await SmarthoModule.disconnect();
   }
 
   async function connectToDevice(device: TBluetoothDevice, cb: () => void) {
@@ -319,6 +323,7 @@ export function useStethoScope(): StethoScopeContextType {
     startMeasurement,
     stopMeasurements,
     initalizeMeasurementGraph,
+    disconnectStethoScope,
     setHeartRateArray,
     setHeartRate,
     isBluetoothEnabled,

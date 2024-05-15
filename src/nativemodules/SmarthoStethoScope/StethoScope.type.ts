@@ -20,6 +20,7 @@ export interface StethoScopeContextType {
   startMeasurement: () => Promise<void>;
   stopMeasurements: () => Promise<string>;
   isBluetoothEnabled: () => Promise<boolean>;
+  disconnectStethoScope: () => Promise<void>;
   initalizeMeasurementGraph: () => void;
   setHeartRateArray: Dispatch<SetStateAction<number[]>>;
   setHeartRate: Dispatch<SetStateAction<number>>;
@@ -42,6 +43,7 @@ export const defaultValue: StethoScopeContextType = {
   toggleEchoMode: async mode => {},
   connectToDevice: async (device, cb) => {},
   startMeasurement: async () => {},
+  disconnectStethoScope: async () => {},
   stopMeasurements: async () => '',
   initalizeMeasurementGraph: () => {},
   setHeartRateArray: () => {},

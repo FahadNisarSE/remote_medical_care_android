@@ -1,13 +1,13 @@
-import { DrawerToggleButton } from '@react-navigation/drawer';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import {DrawerToggleButton} from '@react-navigation/drawer';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   Dimensions,
   FlatList,
   Image,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 
 import AppUpdating from '../components/AppUpdating';
@@ -15,9 +15,11 @@ import CustomTextRegular from '../components/ui/CustomTextRegular';
 import CustomTextSemiBold from '../components/ui/CustomTextSemiBold';
 import Spinner from '../components/ui/Spinner';
 import useMinttiVision from '../nativemodules/MinttiVision/useMinttiVision';
-import { HomeStackNavigatorParamList } from '../utils/AppNavigation';
+import {HomeStackNavigatorParamList} from '../utils/AppNavigation';
 import useBluetoothPermissions from '../utils/hook/useBluetoothPermission';
-import { useMinttiVisionStore } from '../utils/store/useMinttiVisionStore';
+import {useMinttiVisionStore} from '../utils/store/useMinttiVisionStore';
+import {defaultValue} from '../nativemodules/SmarthoStethoScope/StethoScope.type';
+import {StethoScopeContext} from '../nativemodules/SmarthoStethoScope/useStethoScope';
 
 const dimension = Dimensions.get('window');
 
@@ -43,6 +45,8 @@ export default function MinttiInitalization({
   const {discoverDevices, connectToDevice, stopScan} = useMinttiVision({});
   const {bleDevices, isConnecting, isScanning, isConnected, setIsConnecting} =
     useMinttiVisionStore();
+  const {disconnectStethoScope} =
+    useContext(StethoScopeContext) || defaultValue;
 
   useEffect(() => {
     // @ts-ignore
@@ -99,33 +103,40 @@ export default function MinttiInitalization({
         <FlatList
           data={bleDevices}
           keyExtractor={item => item.mac}
-          renderItem={({item}) => (
-            <View className="flex-row flex-1 px-2 py-3 mt-2 rounded-lg bg-background">
-              <View className="items-center justify-center p-2 mr-2 overflow-hidden rounded-full bg-primmary">
-                <Image
-                  className="w-5 h-5"
-                  source={require('../assets/icons/activity.png')}
-                />
+          renderItem={({item}) =>
+            item.name === 'Mintti-Vision' ? (
+              <View className="flex-row flex-1 px-2 py-3 mt-2 rounded-lg bg-background">
+                <View className="items-center justify-center p-2 mr-2 overflow-hidden rounded-full bg-primmary">
+                  <Image
+                    className="w-5 h-5"
+                    source={require('../assets/icons/activity.png')}
+                  />
+                </View>
+                <View className="flex-1">
+                  <CustomTextSemiBold className="text-text">
+                    {item.name}
+                  </CustomTextSemiBold>
+                  <CustomTextRegular className="text-text">
+                    {item.mac}
+                  </CustomTextRegular>
+                </View>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  disabled={isConnecting}
+                  onPress={() => {
+                    disconnectStethoScope();
+                    connectToDevice(item);
+                  }}
+                  className="flex items-center justify-center p-2 my-auto rounded bg-primmary">
+                  <CustomTextRegular className="text-xs text-white">
+                    {isConnecting ? 'Connecting' : 'Connect'}
+                  </CustomTextRegular>
+                </TouchableOpacity>
               </View>
-              <View className="flex-1">
-                <CustomTextSemiBold className="text-text">
-                  {item.name}
-                </CustomTextSemiBold>
-                <CustomTextRegular className="text-text">
-                  {item.mac}
-                </CustomTextRegular>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                disabled={isConnecting}
-                onPress={() => connectToDevice(item)}
-                className="flex items-center justify-center p-2 my-auto rounded bg-primmary">
-                <CustomTextRegular className="text-xs text-white">
-                  {isConnecting ? 'Connecting' : 'Connect'}
-                </CustomTextRegular>
-              </TouchableOpacity>
-            </View>
-          )}
+            ) : (
+              <></>
+            )
+          }
         />
         <View className="p-4 my-5 mt-auto rounded-xl bg-primmary">
           <CustomTextSemiBold className="mb-2 text-xl text-center text-white">

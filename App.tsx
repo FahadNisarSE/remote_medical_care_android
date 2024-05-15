@@ -60,7 +60,7 @@ export default function App() {
       console.log('This part ran.....');
       Toast.show({
         type: 'error',
-        text1: 'Medical device has been diconnected..',
+        text1: 'Mitti Vision has been diconnected..',
       });
     });
 
@@ -110,7 +110,7 @@ export default function App() {
           <AppNavigation />
         </StethoScopeProvider>
       </QueryClientProvider>
-      <NewUpdate showModal={true} />
+      <NewUpdate showModal={false} />
       <Toast />
     </GestureHandlerRootView>
   );

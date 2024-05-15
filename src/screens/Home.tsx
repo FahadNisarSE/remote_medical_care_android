@@ -19,8 +19,6 @@ export default function Home() {
   const {userData} = useSignInStore();
   const {isConnected} = useMinttiVisionStore();
 
-  console.log('is connected: ', isConnected);
-
   return (
     <>
       <AppUpdating />
