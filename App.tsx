@@ -16,6 +16,7 @@ import AppNavigation from './src/utils/AppNavigation';
 import {hideMeetingNotification} from './src/utils/pushNotification';
 import {useMinttiVisionStore} from './src/utils/store/useMinttiVisionStore';
 import DeviceInfo from 'react-native-device-info';
+import NewUpdate from './src/components/NewUpdate';
 
 const inAppUpdates = new SpInAppUpdates(true);
 
@@ -25,7 +26,7 @@ async function getCarrier() {
   const name = await DeviceInfo.getCarrier();
   const value = await NetInfo.fetch();
 
-  console.log("Net info: ", value)
+  console.log('Net info: ', value);
 
   console.log('Carrier Info: ', name);
 }
@@ -56,7 +57,7 @@ export default function App() {
     minttiEventEmitter.addListener('onDisconnected', event => {
       setMinttiConnected(false);
       setMinttiConnecting(false);
-      console.log("This part ran.....")
+      console.log('This part ran.....');
       Toast.show({
         type: 'error',
         text1: 'Medical device has been diconnected..',
@@ -109,6 +110,7 @@ export default function App() {
           <AppNavigation />
         </StethoScopeProvider>
       </QueryClientProvider>
+      <NewUpdate showModal={true} />
       <Toast />
     </GestureHandlerRootView>
   );
